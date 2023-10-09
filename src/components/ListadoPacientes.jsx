@@ -1,7 +1,8 @@
 import React from 'react'
 import { Paciente } from './Paciente'
 
-export const ListadoPacientes = () => {
+export const ListadoPacientes = ({pacientes}) => {
+  // console.log(pacientes)
   return (
     <div className="md:w-1/2 lg:w-3/5 h-screen ">
 
@@ -13,13 +14,15 @@ export const ListadoPacientes = () => {
         </p>
 
         <div className="w-auto md:h-screen overflow-y-scroll">
-          <Paciente />
-          <Paciente />
-          <Paciente />
-          <Paciente />
-          <Paciente />
-          <Paciente />
+          { pacientes.map( (paciente) => { 
+            return(
+              <Paciente key={paciente.id} paciente={paciente}/> 
+            )
+            }) 
+          }
         </div>
+
+        
 
     </div>
   )
