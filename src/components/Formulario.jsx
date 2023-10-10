@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Error } from "./Error"
 
-export const Formulario = ({ setPacientes, pacientes }) => {
+export const Formulario = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 
   const [nombre, setNombre] = useState('')
   const [propietario, setPropietario] = useState('')
@@ -11,6 +11,18 @@ export const Formulario = ({ setPacientes, pacientes }) => {
 
   const [error, setError] = useState(false)
 
+  //pasando los datos del paciente seleccionado al formulario
+  useEffect(() => {
+    if(Object.keys(paciente).length > 0) {//forma de comprobar si un objeto tiene algo
+      setNombre(paciente.nombre)
+      setPropietario(paciente.propietario)
+      setEmail(paciente.email)
+      setFecha(paciente.fecha)
+      setSintomas(paciente.sintomas)
+    }
+  }, [paciente])
+  
+  
   const generarId = () => {
     const random = Math.random().toString(36).substr(2);
     const fecha = Date.now().toString(36)
@@ -19,14 +31,12 @@ export const Formulario = ({ setPacientes, pacientes }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
     //validacion del formulario
     if([ nombre, propietario, email, fecha, sintomas ].includes('')) {
       // console.log('Hay almenos un campo vacio')
       setError(true)
       return
     }
-
     setError(false)
 
     //objeto de paciente
@@ -36,21 +46,27 @@ export const Formulario = ({ setPacientes, pacientes }) => {
       email, 
       fecha, 
       sintomas,
-      id: generarId(),
     }
 
-    console.log(objetoPaciente)
+    if(paciente.id) {
+      // editando el registro
+      objetoPaciente.id = paciente.id
+      const pacientesActualizados = pacientes.map( pacienteState => pacienteState.id === paciente.id ? objetoPaciente : pacienteState)
+      setPacientes(pacientesActualizados)
+      setPaciente({})
+    }else{
+      // nuevo registro
+      objetoPaciente.id = generarId()
+      setPacientes([...pacientes, objetoPaciente])
+    }
 
     //pasando los pacientes y añadiendo el nuevo paciente al final
-    setPacientes([...pacientes, objetoPaciente])
-
     //reiniciando el form
     setNombre('')
     setPropietario('')
     setEmail('')
     setFecha('')
     setSintomas('')
-
   }
 
   return (
@@ -90,7 +106,7 @@ export const Formulario = ({ setPacientes, pacientes }) => {
             <textarea id="sintomas" className="border-2 w-full p-2 mt-2 placeholder-grey-600 rounded-md" cols="30" rows="10" placeholder='Describa los síntomas' value={sintomas} onChange={ (e) => setSintomas(e.target.value)}></textarea>
           </div>
 
-          <input type="submit" className='bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all' value='Agregar paciente'/>
+          <input type="submit" className='bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all' value={ paciente.id ? 'Editar Paciente' : 'Agregar Paciente' }/>
 
         </form>
 
